@@ -8,7 +8,69 @@
 </head>
 
 <body>
+    <code style="background-color : black; color: #fff;">
+        Sub ExportCitiesByPrefectureToJavaScript()
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim citiesByPrefecture As String
+    Dim outputPath As String
+    Dim data As Variant
+    Dim i As Long
+    
+    ' CSVファイルからデータを読み込みます
+    Set wb = ThisWorkbook
+    Set ws = wb.Sheets("Sheet1") ' シート名を適切なものに変更してください
+    data = ws.UsedRange.Value
+    
+    ' 都道府県ごとに市町村のリストを作成します
+    Dim prefecture As String
+    Dim cities As String
+    Dim lastRow As Long
+    Dim prefectures As New Collection
+    
+    lastRow = UBound(data, 1)
+    For i = 1 To lastRow
+        prefecture = data(i, 1)
+        If Not Contains(prefectures, prefecture) Then
+            prefectures.Add prefecture
+        End If
+    Next i
+    
+    ' JavaScriptオブジェクトの文字列を生成します
+    citiesByPrefecture = "{"
+    For Each prefecture In prefectures
+        cities = ""
+        For i = 1 To lastRow
+            If data(i, 1) = prefecture Then
+                cities = cities & """" & data(i, 2) & """, "
+            End If
+        Next i
+        cities = Left(cities, Len(cities) - 2) ' 最後のカンマを削除
+        citiesByPrefecture = citiesByPrefecture & """" & prefecture & """: [" & cities & "], "
+    Next prefecture
+    citiesByPrefecture = Left(citiesByPrefecture, Len(citiesByPrefecture) - 2) ' 最後のカンマを削除
+    citiesByPrefecture = citiesByPrefecture & "}"
+    
+    ' JavaScriptオブジェクトを出力するファイルパスを設定します
+    outputPath = Application.GetSaveAsFilename("citiesByPrefecture.js", "JavaScriptファイル (*.js), *.js")
+    If outputPath = "False" Then Exit Sub ' ファイルダイアログがキャンセルされた場合は処理を終了します
+    
+    ' JavaScriptオブジェクトをファイルに出力します
+    Open outputPath For Output As #1
+    Print #1, "var citiesByPrefecture = " & citiesByPrefecture & ";"
+    Close #1
+    
+    MsgBox "JavaScriptオブジェクトとして出力しました: " & outputPath, vbInformation
+End Sub
 
+Function Contains(coll As Collection, key As Variant) As Boolean
+    On Error Resume Next
+    Contains = Not IsEmpty(coll.Item(key))
+    On Error GoTo 0
+End Function
+
+    </code>
+    
     <select id="prefecture">
   <option value="">都道府県を選択</option>
   <!-- 都道府県のオプションはJavaScriptで生成 -->
