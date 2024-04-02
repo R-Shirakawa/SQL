@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    .custom-alert {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: lightblue;
+      border-radius: 5px;
+      padding: 20px;
+      text-align: center;
+    }
+    .custom-alert button {
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="showCustomAlert()">カスタムalertを表示</button>
+  <div id="customAlert" class="custom-alert">
+    <p>これはカスタムalertです。</p>
+    <button onclick="hideCustomAlert()">閉じる</button>
+  </div>
+  <script>
+    function showCustomAlert() {
+      document.getElementById("customAlert").style.display = "block";
+    }
+    function hideCustomAlert() {
+      document.getElementById("customAlert").style.display = "none";
+    }
+  </script>
+</body>
+</html>
