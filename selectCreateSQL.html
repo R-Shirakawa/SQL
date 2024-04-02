@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        input[type="text"] {
+            width: 500px;
+        }
+        
+        .updateSql {
+            display: flex;
+            align-items: center;
+        }
+        
+        textarea#updateSql {
+            width: 1000px;
+        }
+        
+        .selectCondition2 {
+            display: none;
+        }
+        
+        .input-error {
+            background-color: #ffe6e6;
+        }
+    </style>
+    <title>SQL SELECT文生成ツール</title>
+</head>
+
+<body>
+
+    <h2>SQL SELECT文生成ツール</h2>
+
+    <form id="selectForm">
+        <label for="selectTableName">テーブル名(必須)：</label>
+        <input type="text" id="selectTableName" name="selectTableName" placeholder="ここにテーブル名を入力してください" required><br><br>
+
+        <label for="selectColumnName">検索したいカラム名：</label>
+        <input type="text" id="selectColumnName" name="selectColumnName" placeholder="ここに検索したいカラム名を入力してください"><br><br>
+
+        <label for="selectConditionColumn">条件となるカラム名：</label>
+        <input type="text" id="selectConditionColumn" name="selectConditionColumn" placeholder="ここに検索対象レコードを特定できるカラム名を入力してください"><br><br>
+
+        <label for="selectConditionValue">条件の値：</label>
+        <input type="text" id="selectConditionValue" name="selectConditionValue" placeholder="ここに検索対象レコードを特定できる値を入力してください">
+
+        <label for="selectConditionValueType">データ型(条件入力時は必須)：</label>
+        <select id="selectConditionValueType" name="selectConditionValueType">
+            <option value="" disabled selected style="display:none;">データの型を選択してください</option>
+            <option value="数値">数値</option>
+            <option value="文字型">文字型</option>
+        </select>
+
+        <br><br>
+
+        <label for="selectConditionFlg2">条件が複数ある場合はここにチェック</label>
+        <input type="checkbox" name="selectConditionFlg2" id="selectConditionFlg2" onchange="selectConditionFlg()">
+
+        <br><br>
+
+        <div class="selectCondition2">
+            <label for="selectConditionColumn2">2つ目の条件となるカラム名：</label>
+            <input type="text" id="selectConditionColumn2" name="selectConditionColumn2" placeholder="ここに検索対象レコードを特定できるカラム名を入力してください"><br><br>
+
+            <label for="selectConditionValue2">2つ目の条件の値：</label>
+            <input type="text" id="selectConditionValue2" name="selectConditionValue2" placeholder="ここに検索対象レコードを特定できる値を入力してください">
+
+            <label for="selectConditionValueType2">データ型(条件入力時は必須)：</label>
+            <select id="selectConditionValueType2" name="selectConditionValueType2">
+                <option value="" disabled selected style="display:none;">データの型を選択してください</option>
+                <option value="数値">数値</option>
+                <option value="文字型">文字型</option>
+            </select>
+
+            <br><br>
+        </div>
+
+        <button type="button" value="SQL文を生成" onclick="createSelectSQL()">SQL文を生成</button><br><br>
+
+        <div class="selectSql">
+            <label for="selectSql">生成したSQL文：</label>
+            <textarea name="selectSql" id="selectSql" rows="1"></textarea>
+        </div>
+    </form>
+
+    <script>
+        function selectConditionFlg() {
+            var selectConditionFlg2 = document.getElementById("selectConditionFlg2");
+            var selectCondition2 = document.querySelector(".selectCondition2");
+
+            if (selectConditionFlg2.checked) {
+                selectCondition2.style.display = "block";
+
+            } else {
+                selectCondition2.style.display = "none";
+            }
+        }
+
+        function createSelectSQL() {
+            var selectTableName = document.getElementById("selectTableName").value;
+            var selectColumnName = document.getElementById("selectColumnName").value;
+
+            var selectConditionColumn = document.getElementById("selectConditionColumn").value;
+            var selectConditionValue = document.getElementById("selectConditionValue").value;
+            var selectConditionValueType = document.getElementById("selectConditionValueType").value;
+
+            var selectConditionColumn2 = document.getElementById("selectConditionColumn2").value;
+            var selectConditionValue2 = document.getElementById("selectConditionValue2").value;
+            var selectConditionValueType2 = document.getElementById("selectConditionValueType2").value;
+
+
+            // 必須入力の入力チェック
+            if (selectTableName === "") {
+                alert("テーブル名は必須項目です");
+                // 入力がされていない項目に対してクラスを追加して背景色を変更
+                if (selectTableName === "") document.getElementById("selectTableName").classList.add('input-error');
+
+                if (selectConditionColumn !== "" && selectConditionValue !== "" && selectConditionValueType === "") {
+                    document.getElementById("selectConditionValueType").classList.add('input-error');
+                }
+                return;
+            } else {
+                document.getElementById("selectTableName").classList.remove('input-error');
+                document.getElementById("selectConditionValueType").classList.remove('input-error');
+            }
+
+            if (selectColumnName !== "") {
+                var strSQL = "SELECT TOP (1000) " + selectColumnName + " FROM " + selectTableName;
+            } else {
+                var strSQL = "SELECT TOP (1000) *  FROM " + selectTableName;
+            }
+
+            // 条件が指定されている場合は条件を追加
+            if (selectConditionColumn !== "" || selectConditionValue !== "") {
+                if (selectConditionValueType === "") {
+                    alert("データ型を選択してください");
+                    document.getElementById("selectConditionValueType").classList.add('input-error');
+                    return;
+                }
+                strSQL += " WHERE " + selectConditionColumn + " = ";
+
+                // 条件の値のデータ型に応じてシングルクォーテーションを付ける（文字列の場合はシングルクォーテーション付きで生成）
+                if (selectConditionValueType !== "文字型") {
+                    strSQL += selectConditionValue;
+                } else {
+                    strSQL += "'" + selectConditionValue + "'";
+                }
+            }
+
+            // 条件が指定されている場合は条件を追加
+            if (selectConditionColumn2 !== "" || selectConditionValue2 !== "") {
+                if (selectConditionValueType2 === "") {
+                    alert("データ型を選択してください");
+                    document.getElementById("selectConditionValueType2").classList.add('input-error');
+                    return;
+                }
+                strSQL += " AND " + selectConditionColumn2 + " = ";
+
+                // 条件の値のデータ型に応じてシングルクォーテーションを付ける（文字列の場合はシングルクォーテーション付きで生成）
+                if (selectConditionValueType2 !== "文字型") {
+                    strSQL += selectConditionValue2;
+                } else {
+                    strSQL += "'" + selectConditionValue2 + "'";
+                }
+            }
+
+            document.getElementById("selectSql").value = strSQL;
+
+            // 生成したSQL文を表示
+            alert("SQL文の生成が完了しました。生成したSQL文は以下です。\n「" + strSQL + "」");
+        }
+    </script>
+
+</body>
+
+</html>
