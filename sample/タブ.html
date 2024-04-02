@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+    
+    p {
+        margin: 0;
+    }
+    
+    .wrap-tab {
+        overflow: hidden;
+    }
+    
+    .list-tab {
+        display: flex;
+        margin: 0 -2px;
+        border-bottom: 3px solid #5bbee5;
+    }
+    
+    .list-tab>li {
+        display: block;
+        padding: 0.5em 1em;Ï
+        margin: 0 2px;
+        width: 100%;
+        color: #fff;
+        text-align: center;
+        background: #ccc;
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+    
+    .list-tab .active {
+        background: #5bbee5;
+    }
+    
+    .tab-content {
+        display: none;
+        padding: 1em;
+        border-bottom: 1px solid #5bbee5;
+        border-left: 1px solid #5bbee5;
+        border-right: 1px solid #5bbee5;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+</style>
+<div class="wrap-tab">
+    <ul id="js-tab" class="list-tab">
+        <li class="active">タブ1</li>
+        <li>タブ2</li>
+        <li>タブ3</li>
+        <li>タブ4</li>
+    </ul>
+
+    <div class="wrap-tab-content">
+        <div class="tab-content active">
+            <p>タブ1タブ1タブ1</p>
+        </div>
+
+        <div class="tab-content">
+            <p>タブ2タブ2タブ2</p>
+        </div>
+
+        <div class="tab-content">
+            <p>タブ3タブ3タブ3</p>
+        </div>
+
+        <div class="tab-content">
+            <p>タブ4タブ4タブ4</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        tabs = document.querySelectorAll('#js-tab li');
+        for (i = 0; i < tabs.length; i++) {
+            tabs[i].addEventListener('click', tabSwitch, false);
+        }
+
+        function tabSwitch() {
+            tabs = document.querySelectorAll('#js-tab li');
+            var node = Array.prototype.slice.call(tabs, 0);
+            node.forEach(function(element) {
+                element.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            content = document.querySelectorAll('.tab-content');
+            var node = Array.prototype.slice.call(content, 0);
+            node.forEach(function(element) {
+                element.classList.remove('active');
+            });
+
+            const arrayTabs = Array.prototype.slice.call(tabs);
+            const index = arrayTabs.indexOf(this);
+
+            document.querySelectorAll('.tab-content')[index].classList.add('active');
+        };
+    });
+</script>
+
+</html>
