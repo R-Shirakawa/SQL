@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Select Boxes</title>
+</head>
+
+<body>
+    <!-- テーブルを選択するセレクトボックス -->
+    <label for="tableSelect">テーブル名:</label>
+    <select id="tableSelect">
+    <option value="">テーブルを選択</option>
+    <!-- テーブルの選択肢はJavaScriptで動的に追加される -->
+  </select>
+    <br><br>
+
+    <!-- カラムを選択するセレクトボックス -->
+    <label for="columnSelect">カラム名:</label>
+    <select id="columnSelect">
+    <option value="">カラムを選択</option>
+    <!-- カラムの選択肢はJavaScriptで動的に追加される -->
+  </select>
+    <br><br>
+
+    <!-- データ型を表示するセレクトボックス -->
+    <label for="dataTypeSelect">データ型:</label>
+    <select id="dataTypeSelect">
+    <option value="">データ型を選択</option>
+    <!-- データ型の選択肢はJavaScriptで動的に追加される -->
+  </select>
+
+    <script>
+        // テーブル情報のJSONデータ
+        const jsonData = {
+            "users": {
+                "id": "int",
+                "username": "string",
+                "email": "string",
+                "created_at": "datetime"
+            },
+            "posts": {
+                "id": "int",
+                "user_id": "int",
+                "content": "text",
+                "created_at": "datetime"
+            },
+            "comments": {
+                "id": "int",
+                "post_id": "int",
+                "user_id": "int",
+                "content": "text",
+                "created_at": "datetime"
+            }
+        };
+
+        // セレクトボックスの要素を取得
+        const tableSelect = document.getElementById('tableSelect');
+        const columnSelect = document.getElementById('columnSelect');
+        const dataTypeSelect = document.getElementById('dataTypeSelect');
+
+        // テーブルの選択肢をセレクトボックスに追加
+        for (const table in jsonData) {
+            const option = document.createElement('option');
+            option.value = table;
+            option.textContent = table;
+            tableSelect.appendChild(option);
+        }
+
+        // テーブルを選択した時にカラムの選択肢を更新
+        tableSelect.addEventListener('change', () => {
+            const selectedTable = tableSelect.value;
+            columnSelect.innerHTML = '<option value="">カラムを選択</option>';
+
+            if (selectedTable) {
+                const columns = Object.keys(jsonData[selectedTable]);
+                columns.forEach(column => {
+                    const option = document.createElement('option');
+                    option.value = column;
+                    option.textContent = column;
+                    columnSelect.appendChild(option);
+                });
+            }
+        });
+
+        // カラムを選択した時にデータ型を選択済みにする
+        columnSelect.addEventListener('change', () => {
+            const selectedTable = tableSelect.value;
+            const selectedColumn = columnSelect.value;
+
+            if (selectedTable && selectedColumn) {
+                const dataType = jsonData[selectedTable][selectedColumn];
+
+                // カラムに対応するデータ型のオプションを追加し、選択状態にする
+                const dataTypeOption = document.createElement('option');
+                dataTypeOption.value = dataType;
+                dataTypeOption.textContent = dataType;
+                dataTypeSelect.innerHTML = ''; // データ型のセレクトボックスをクリア
+                dataTypeSelect.appendChild(dataTypeOption);
+                dataTypeOption.selected = true;
+            }
+        });
+    </script>
+</body>
+
+</html>
