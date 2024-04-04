@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+
+function generateJSON() {
+  // 現在のワークシートを取得
+  let sheet = Excel.run(function (context) {
+    return context.workbook.worksheets.getActiveWorksheet();
+  });
+
+  // データの範囲を取得
+  let range = sheet.getRange("A1:C" + sheet.getUsedRange().rowCount);
+  
+  // データを取得
+  range.load("values");
+  await context.sync();
+  
+  let jsonData = {};
+
+  // JSONオブジェクトを構築
+  for (let i = 0; i < range.values.length; i++) {
+    let keyA = range.values[i][0];
+    let keyB = range.values[i][1];
+    let valueC = range.values[i][2];
+    
+    if (!jsonData[keyA]) {
+      jsonData[keyA] = {};
+    }
+    
+    jsonData[keyA][keyB] = valueC;
+  }
+
+  // JSONを文字列に変換
+  let jsonString = JSON.stringify(jsonData, null, 2);
+
+  // メッセージボックスにJSONデータを表示
+  await Excel.run(async (context) => {
+    await context.sync();
+    Office.context.ui.displayDialogAsync(
+      "data:text/html,<script>window.alert('JSONデータ:\\n\\n" + jsonString.replace(/'/g, "\\'") + "');</script>"
+    );
+  });
+
+  // JSONファイルを作成しダウンロード
+  let blob = new Blob([jsonString], { type: "application/json" });
+  let downloadLink = document.createElement("a");
+  downloadLink.download = "output.json";
+  downloadLink.href = window.URL.createObjectURL(blob);
+  downloadLink.click();
+}
+
+</script>
+</html>
