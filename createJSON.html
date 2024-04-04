@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+function generateJSON() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("Sheet1"); // シート名を適切な名前に変更してください
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  
+  var jsonData = {};
+  
+  // スプレッドシートからデータを取得し、JSONオブジェクトに変換
+  for (var i = 1; i < values.length; i++) { // 1行目はヘッダーなので、2行目から処理します
+    var keyA = values[i][0]; // A列の値をキーとして取得
+    var keyB = values[i][1]; // B列の値をキーとして取得
+    var valueC = values[i][2]; // C列の値を取得
+    
+    if (!jsonData[keyA]) {
+      jsonData[keyA] = {};
+    }
+    
+    jsonData[keyA][keyB] = valueC;
+  }
+  
+  // JSONを文字列に変換
+  var jsonString = JSON.stringify(jsonData, null, 2); // 2はインデントのスペース数
+  
+  // JSONをファイルとして保存
+  var jsonFile = DriveApp.createFile("output.json", jsonString);
+  Logger.log("JSONファイルが作成されました。ファイルID: " + jsonFile.getId());
+}
+</script>
+</html>
